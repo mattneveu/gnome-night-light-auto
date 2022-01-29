@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=night-light-auto
+GenericName=night-light-auto
+Comment=Auto set color temp of gnome night light
+Exec=/usr/local/bin/night-light-auto.pl
+Terminal=false
+Type=Application
+X-GNOME-Autostart-enabled=true
