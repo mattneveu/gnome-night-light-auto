@@ -20,6 +20,8 @@ use Config::Simple; # perl-config-simple
 use DateTime; # perl-datetime
 use DateTime::Format::Strptime; # perl-datetime-format-strptime
 use Data::Dump qw(dump); # perl-data-dump
+use Sys::Syslog; # perl-unix-syslog
+use Sys::Syslog qw(:standard :macros); 
 use constant SUNSET_API => 'https://api.sunrise-sunset.org/json';
 use constant CONFIG_FILE_PATH => '/.config/night-light-auto.cfg';
 use constant STEP_CONST => 5;
@@ -28,6 +30,9 @@ my $cfg = new Config::Simple();
 $cfg->read($ENV{"HOME"} . CONFIG_FILE_PATH);
 my $fade_color_step = ($cfg->param('Day_temp') - $cfg->param('Night_temp')) / STEP_CONST;
 my $fade_time_step = ($cfg->param('Fade_in') / STEP_CONST) * 60;
+
+openlog($_[0], "pid", LOG_DAEMON);
+syslog(LOG_INFO, 'Starting daemon');
 
 sub get_sunrise_sunset_data
 {
@@ -59,9 +64,12 @@ sub time_to_int
 sub set_gnome_temp_color
 {
     # $_[0] == $temp_color (kelvin)
-    return system("/usr/bin/gsettings", 
+    syslog(LOG_INFO, 'Changing Gnome night light color temp to value: '. $_[0]);
+    unless (system("/usr/bin/gsettings", 
                 "set", "org.gnome.settings-daemon.plugins.color",
-                "night-light-temperature", $_[0]);
+                "night-light-temperature", $_[0])) {
+        syslog(LOG_ERR, 'Error while trying to set Gnome night light color temp to new value');
+    }
 }
 
 sub get_gnome_temp_color
@@ -169,6 +177,7 @@ while (1)
                 }
                 else
                 {
+                    syslog(LOG_INFO, 'The Sun is rising.');
                     set_gnome_temp_color($cur_temp + $fade_color_step);
                     sleep($fade_time_step);
                 }
@@ -184,6 +193,7 @@ while (1)
                     }
                     else
                     {
+                        syslog(LOG_INFO, 'The Sun is setting.');
                         set_gnome_temp_color($cur_temp - $fade_color_step);
                         sleep($fade_time_step);
                     }               
@@ -195,4 +205,5 @@ while (1)
     sleep(60*5);
 }
 
+closelog();
 exit 0;
