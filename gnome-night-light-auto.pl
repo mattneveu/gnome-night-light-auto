@@ -2,11 +2,11 @@
 
 ##########################################################
 #
-#   Script Name : night-light-auto.pl
+#   Script Name : gnome-night-light-auto.pl
 #   Description : automatic switching of light temperature
 #                  through the seasons
 #   Required Args : None
-#   Config file: $HOME/.config/night-light-auto.conf
+#   Config file: $HOME/.config/gnome-night-light-auto.conf
 #   Author : Matthieu Neveu (2022-01-28)
 #   Version : 0.1
 #
@@ -23,7 +23,7 @@ use Data::Dump qw(dump); # perl-data-dump
 use Sys::Syslog; # perl-unix-syslog
 use Sys::Syslog qw(:standard :macros); 
 use constant SUNSET_API => 'https://api.sunrise-sunset.org/json';
-use constant CONFIG_FILE_PATH => '/.config/night-light-auto.cfg';
+use constant CONFIG_FILE_PATH => '/.config/gnome-night-light-auto.cfg';
 use constant STEP_CONST => 5;
 
 my $cfg = new Config::Simple();
