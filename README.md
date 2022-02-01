@@ -1,5 +1,5 @@
 # gnome-night-light-auto
-Allows to keep Gnome Night Light plugin always on while setting color temp according to to GPS location.
+Allows to keep Gnome Night Light plugin always on while setting color temp according to GPS location.
 
 Configuration file in ~/.config/gnome-night-light-auto.cfg :
 
