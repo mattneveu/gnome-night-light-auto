@@ -32,16 +32,24 @@ my $fade_color_step = ($cfg->param('Day_temp') - $cfg->param('Night_temp')) / ST
 my $fade_time_step = ($cfg->param('Fade_in') / STEP_CONST) * 60;
 
 openlog($_[0], "pid", LOG_DAEMON);
-syslog(LOG_INFO, 'Starting daemon');
+syslog(LOG_INFO, "Starting daemon with values: Lat:".$cfg->param('Latitude') .
+                " Lng:".$cfg->param('Longitude')." Day_temp:".$cfg->param('Day_temp').
+                " Night_temp:".$cfg->param('Night_temp'));
 
 sub get_sunrise_sunset_data
 {
     my ($URL, $jdata);
     $URL = SUNSET_API . "?lat=".$cfg->param('Latitude')."&lng=".$cfg->param('Longitude');
+
+    syslog(LOG_INFO, "Updating Sunset & Sunrise timings.");
+
     unless (defined ($jdata = get $URL)) {
-        die "could not fetch sunset time from API\n";
+        syslog(LOG_ERR, "Could not fetch sunset time from API");
     }
     my $pdata = parse_json($jdata);
+    syslog(LOG_INFO, "Sunrise time (UTC): ".$pdata->{'results'}->{'sunrise'}.
+                    " Sunset time (UTC): ".$pdata->{'results'}->{'sunset'});
+
     my $strp = DateTime::Format::Strptime->new(
         pattern   => '%r'
     );
@@ -65,7 +73,7 @@ sub set_gnome_temp_color
 {
     # $_[0] == $temp_color (kelvin)
     syslog(LOG_INFO, 'Changing Gnome night light color temp to value: '. $_[0]);
-    unless (system("/usr/bin/gsettings", 
+    if (system("/usr/bin/gsettings", 
                 "set", "org.gnome.settings-daemon.plugins.color",
                 "night-light-temperature", $_[0])) {
         syslog(LOG_ERR, 'Error while trying to set Gnome night light color temp to new value');
@@ -201,8 +209,8 @@ while (1)
             }
         }
     }
-    # sleep 5m between iterations
-    sleep(60*5);
+    # sleep 3m between iterations
+    sleep(60*3);
 }
 
 closelog();
