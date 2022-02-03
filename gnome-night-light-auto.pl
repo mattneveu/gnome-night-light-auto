@@ -204,6 +204,7 @@ while (1)
                         syslog(LOG_INFO, 'The Sun is setting.');
                         set_gnome_temp_color($cur_temp - $fade_color_step);
                         sleep($fade_time_step);
+                        continue;
                     }               
                 }
             }
