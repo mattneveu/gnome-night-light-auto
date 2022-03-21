@@ -181,7 +181,7 @@ while (1)
                             $sun_timings{'sunrise_fade'})) {
                 $cur_step = ($cfg->param('Day_temp') - $cur_temp) / STEP_CONST;
                 if($cur_step == 0) {
-                    continue; #leaving
+                    next; #leaving
                 }
                 else
                 {
@@ -197,14 +197,14 @@ while (1)
                                   $sun_timings{'sunset_fade'})) {
                     $cur_step = ($cur_temp - $cfg->param('Night_temp')) / STEP_CONST;  
                     if($cur_step == 0) {
-                        continue; #leaving
+                        next; #leaving
                     }
                     else
                     {
                         syslog(LOG_INFO, 'The Sun is setting.');
                         set_gnome_temp_color($cur_temp - $fade_color_step);
                         sleep($fade_time_step);
-                        continue;
+                        next;
                     }               
                 }
             }
